@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#17242b" />
+    <meta name="description" content="A personal interview notebook for system design, coding, and behavioral / leadership revision." />
+    <title>Interview library · prep</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='10' fill='%2317242b'/%3E%3Cpath d='M12 10h15v21H12z' fill='none' stroke='%23a9e3c5' stroke-width='2.5'/%3E%3Cpath d='M17 10v21m4-15h3m-3 5h3' stroke='%23a9e3c5' stroke-width='2'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="./styles.css" />
+    <script type="module" src="./app.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <div class="sidebar-backdrop" id="sidebar-backdrop" hidden></div>
+    <aside class="sidebar" id="sidebar" aria-label="Notebook navigation">
+      <a class="brand" href="#/" aria-label="prep home"><span class="brand-icon" aria-hidden="true">▤</span>prep<span class="brand-dot">.</span></a>
+      <div class="sidebar-caption">INTERVIEW NOTEBOOK</div>
+      <nav id="navigation" aria-label="Sections and topics"></nav>
+      <div class="sidebar-footer"><span class="workspace-avatar" aria-hidden="true">P</span><div>Personal workspace<span id="workspace-count">3 sections</span></div></div>
+    </aside>
+    <div class="workspace">
+      <header class="topbar">
+        <button class="mobile-menu icon-button" id="menu-toggle" aria-label="Open navigation" aria-controls="sidebar" aria-expanded="false"></button>
+        <div class="search" id="search-container">
+          <span class="search-icon" id="search-icon" aria-hidden="true"></span>
+          <input id="search-input" type="search" role="combobox" aria-label="Search all topics and sections" aria-autocomplete="list" aria-expanded="false" aria-controls="search-results" placeholder="Search all topics and sections…" autocomplete="off" spellcheck="false" />
+          <kbd class="search-shortcut" id="search-shortcut">⌘ K</kbd>
+          <button class="clear-search icon-button" id="clear-search" aria-label="Clear search" hidden>×</button>
+          <div class="search-panel" id="search-panel" hidden>
+            <div class="search-panel-heading">SEARCH YOUR NOTEBOOK <span id="result-count"></span></div>
+            <div id="search-results" role="listbox" aria-label="Search results"></div>
+            <div class="search-help"><span><kbd>↑</kbd><kbd>↓</kbd> navigate</span><span><kbd>↵</kbd> open</span><span><kbd>esc</kbd> close</span></div>
+          </div>
+        </div>
+      </header>
+      <main id="main" tabindex="-1"></main>
+      <footer class="page-footer"><span>prep / your interview notebook</span></footer>
+    </div>
+    <div class="code-sheet-layer" id="code-sheet-layer" hidden>
+      <button class="code-sheet-backdrop" id="code-sheet-backdrop" type="button" aria-label="Close code panel"></button>
+      <aside class="code-sheet" id="code-sheet" role="dialog" aria-modal="true" aria-labelledby="code-sheet-title" aria-describedby="code-sheet-note" tabindex="-1">
+        <header class="code-sheet-header">
+          <div><span id="code-sheet-subtitle"></span><h2 id="code-sheet-title"></h2></div>
+          <button class="code-sheet-close" id="code-sheet-close" type="button" aria-label="Close code panel">×</button>
+        </header>
+        <p class="code-sheet-note" id="code-sheet-note"></p>
+        <div class="code-frame"><div class="code-frame-label">JAVA 17</div><pre><code id="code-sheet-content"></code></pre></div>
+        <footer class="code-sheet-footer"><span>Esc to close</span><span id="code-sheet-footer-context">Local implementation</span></footer>
+      </aside>
+    </div>
+    <div class="sr-only" id="search-announcement" role="status" aria-live="polite"></div>
+    <noscript>This notebook needs JavaScript to display topics and search.</noscript>
+  </body>
+</html>
