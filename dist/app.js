@@ -106,7 +106,7 @@ function annotateTopicContent(topic, section, html) {
     if (text.length < 5) continue;
     if (element.matches('h2')) { heading = text; subheading = ''; question = ''; }
     if (element.matches('h3, h4')) { subheading = text; question = ''; }
-    if (element.matches('summary')) question = text.replace(/^\d+\s*/, '');
+    if (element.matches('summary')) question = text.replace(/^\d+\s*/, '').replace(/\s*[＋+]\s*$/, '');
     // Search anchors are generated in document order and inserted into the cached page HTML.
     const anchor = element.id || `find-${topic.id}-${++count}`;
     if (!element.id) element.id = anchor;
@@ -582,7 +582,7 @@ for (const [topicId, examples] of [['rate-limiter', rateLimiterCodeExamples], ['
   const topic = topics.find((item) => item.id === topicId);
   const section = sections.find((item) => item.id === topic.section);
   for (const [exampleId, example] of Object.entries(examples)) {
-    searchIndex.push({ id: `${topicId}:code:${exampleId}`, kind: 'code', sectionId: section.id, title: `${example.title} · Java`, subtitle: `${section.title} › ${topic.title} › Code`, snippet: `${example.note} ${example.code}`, searchText: `${example.title} ${example.note} ${example.code}`, href: `#/topic/${topicId}/code/${exampleId}`, color: section.color, icon: 'code' });
+    searchIndex.push({ id: `${topicId}:code:${exampleId}`, kind: 'code', sectionId: section.id, title: `${example.title} · Java`, subtitle: `${section.title} › ${topic.title} › Code`, snippet: example.note, searchText: `${example.title} ${example.note} ${example.code}`, href: `#/topic/${topicId}/code/${exampleId}`, color: section.color, icon: 'code' });
   }
 }
 render();
