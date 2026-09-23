@@ -5,6 +5,7 @@ import { highlightJava } from './java-highlight.js';
 import { codingPatternCodeExamples } from './coding-pattern-code.js';
 import { fullKafkaArchitectContent } from './kafka-content.js';
 import { streamingStaffSections } from './streaming-staff-plus-content.js';
+import { gcpPlaybookSections } from './gcp-playbook-content.js';
 
 const $ = (id) => document.getElementById(id);
 const escapeHTML = (value) => String(value).replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
@@ -21,6 +22,8 @@ const paths = {
   note: '<path d="M6 3h12v18H6zM9 7h6M9 11h6M9 15h4"/>',
   book: '<path d="M4 4h6a3 3 0 0 1 2 1 3 3 0 0 1 2-1h6v15h-6a3 3 0 0 0-2 1 3 3 0 0 0-2-1H4zM12 5v15"/>',
   menu: '<path d="M4 6h16M4 12h16M4 18h16"/>',
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/>',
+  moon: '<path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5 8.5 8.5 0 1 0 20.5 14.5Z"/>',
 };
 const icon = (name, className = '') => `<svg class="${className}" viewBox="0 0 24 24" aria-hidden="true">${paths[name] || paths.note}</svg>`;
 const sectionIcon = (section, small = false) => `<span class="section-icon ${section.color} ${small ? 'small' : ''}">${icon(section.icon)}</span>`;
@@ -34,6 +37,23 @@ let codeSheetTrigger = null;
 
 $('search-icon').innerHTML = icon('search');
 $('menu-toggle').innerHTML = icon('menu');
+
+function updateThemeButton() {
+  const dark = document.documentElement.dataset.theme === 'dark';
+  $('theme-toggle').innerHTML = icon(dark ? 'sun' : 'moon');
+  $('theme-toggle').setAttribute('aria-label', dark ? 'Use light theme' : 'Use dark theme');
+  $('theme-toggle').title = dark ? 'Use light theme' : 'Use dark theme';
+  document.querySelector('meta[name="theme-color"]').content = dark ? '#10181d' : '#17242b';
+}
+
+function setTheme(theme, persist = true) {
+  document.documentElement.dataset.theme = theme;
+  if (persist) localStorage.setItem('prep-theme', theme);
+  updateThemeButton();
+}
+
+updateThemeButton();
+$('theme-toggle').addEventListener('click', () => setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'));
 document.querySelector('.skip-link').addEventListener('click', (event) => {
   event.preventDefault();
   $('main').focus();
@@ -73,7 +93,7 @@ function topicPage(topic, section) {
   const index = siblings.findIndex((item) => item.id === topic.id);
   const previous = siblings[index - 1];
   const next = siblings[index + 1];
-  const content = topic.id === 'rate-limiter' ? rateLimiterContent() : topic.id === 'kafka-architect' ? fullKafkaArchitectContent() : topic.id === 'streaming-staff-plus' ? streamingStaffGuideContent() : topic.id === 'coding-patterns' ? codingPatternsContent() : topic.blocks.length ? topic.blocks.map((block) => `<section class="content-block"><h2>${escapeHTML(block.heading)}</h2>${block.text ? `<p>${escapeHTML(block.text)}</p>` : ''}${block.bullets?.length ? `<ul>${block.bullets.map((bullet) => `<li>${escapeHTML(bullet)}</li>`).join('')}</ul>` : ''}</section>`).join('') : `<section class="placeholder-page"><div class="placeholder-label">${icon('note')} TOPIC OUTLINE</div><h2>Ready for the essentials.</h2><p>The page is in place. Your revision notes and section structure will go here.</p><div aria-hidden="true"><div class="placeholder-line"></div><div class="placeholder-line"></div></div></section>`;
+  const content = topic.id === 'rate-limiter' ? rateLimiterContent() : topic.id === 'kafka-architect' ? fullKafkaArchitectContent() : topic.id === 'streaming-staff-plus' ? streamingStaffGuideContent() : topic.id === 'gcp-data-engineering' ? gcpPlaybookContent() : topic.id === 'coding-patterns' ? codingPatternsContent() : topic.blocks.length ? topic.blocks.map((block) => `<section class="content-block"><h2>${escapeHTML(block.heading)}</h2>${block.text ? `<p>${escapeHTML(block.text)}</p>` : ''}${block.bullets?.length ? `<ul>${block.bullets.map((bullet) => `<li>${escapeHTML(bullet)}</li>`).join('')}</ul>` : ''}</section>`).join('') : `<section class="placeholder-page"><div class="placeholder-label">${icon('note')} TOPIC OUTLINE</div><h2>Ready for the essentials.</h2><p>The page is in place. Your revision notes and section structure will go here.</p><div aria-hidden="true"><div class="placeholder-line"></div><div class="placeholder-line"></div></div></section>`;
   return `${breadcrumb(section, topic)}<div class="topic-header"><p class="eyebrow">${escapeHTML(section.title.toUpperCase())}</p><div class="heading-row"><h1>${escapeHTML(topic.title)}</h1>${badge(topic)}</div><p class="intro">${escapeHTML(topic.description)}</p></div><div class="topic-body">${content}</div><nav class="topic-pagination" aria-label="Adjacent topics">${previous ? `<a href="#/topic/${previous.id}"><span>Previous topic</span>← ${escapeHTML(previous.title)}</a>` : `<a href="#/section/${section.id}"><span>Back to section</span>← ${escapeHTML(section.title)}</a>`}${next ? `<a class="next" href="#/topic/${next.id}"><span>Next topic</span>${escapeHTML(next.title)} →</a>` : ''}</nav>`;
 }
 
@@ -236,6 +256,12 @@ function streamingStaffGuideContent() {
   return `<article class="streaming-guide-full"><nav class="streaming-domain-nav" aria-label="Question domains"><span>QUESTION DOMAINS</span>${nav}</nav><div class="streaming-guide-content"><section class="revision-card streaming-guide-hero"><div><span class="revision-kicker">STAFF+ / ARCHITECT REVISION GUIDE</span><h2>Streaming systems, in interview-sized answers.</h2><p>${total} architecture questions covering event streaming, delivery semantics, state, resilience, governance, technology trade-offs, leadership, and incident scenarios.</p></div><div class="streaming-guide-metrics"><b>${total}<small>questions</small></b><b>${streamingStaffSections.length}<small>domains</small></b></div></section><div class="streaming-guide-tools"><label>${icon('search')}<input type="search" id="streaming-question-search" placeholder="Search all questions and answers" aria-label="Search streaming questions and answers"></label><span id="streaming-question-count">Showing ${total} of ${total}</span><span id="streaming-reviewed-count">Reviewed 0 / ${total}</span><button type="button" data-stream-toggle>Expand all</button></div>${content}<section class="revision-card interview-pattern"><span class="revision-kicker">INTERVIEW PATTERN</span><p>Clarify requirements → quantify scale and SLOs → identify failure modes → explain trade-offs → cover operations and ownership.</p></section></div></article>`;
 }
 
+function gcpPlaybookContent() {
+  const nav = gcpPlaybookSections.map((section) => `<button type="button" data-scroll-to="gcp-${section.id}">${escapeHTML(section.title)}</button>`).join('');
+  const content = gcpPlaybookSections.map((section) => `<section class="gcp-section" id="gcp-${section.id}">${section.html}</section>`).join('');
+  return `<article class="rate-guide gcp-playbook"><nav class="topic-jump" aria-label="GCP playbook sections"><span>PLAYBOOK INDEX</span>${nav}</nav><section class="revision-card gcp-hero"><div><span class="revision-kicker">INTERVIEW FIELD GUIDE / STAFF+</span><h2>GCP data engineering. Know what matters.</h2><p>A compact preparation map for engineers who already know Spark, Airflow, Flink, and Kafka. Focus on architectural judgment, GCP depth, production correctness, and cross-team leadership.</p></div><div class="gcp-priorities"><span><b>01</b> BigQuery</span><span><b>02</b> Beam & Dataflow</span><span><b>03</b> SQL & modeling</span></div></section>${content}</article>`;
+}
+
 const streamingReviewKey = 'prep-streaming-reviewed';
 
 function streamingReviewed() {
@@ -293,7 +319,7 @@ function render({ focus = false } = {}) {
     title = 'Page not found';
   }
   $('main').innerHTML = html;
-  $('main').className = ['rate-limiter', 'kafka-architect', 'coding-patterns'].includes(topic?.id) ? 'rate-limiter-page' : topic?.id === 'streaming-staff-plus' ? 'streaming-guide-page' : '';
+  $('main').className = ['rate-limiter', 'kafka-architect', 'coding-patterns', 'gcp-data-engineering'].includes(topic?.id) ? 'rate-limiter-page' : topic?.id === 'streaming-staff-plus' ? 'streaming-guide-page' : '';
   document.title = `${title} · prep`;
   renderNavigation(section?.id, topic?.id, title === 'Interview library');
   if (topic?.id === 'streaming-staff-plus') refreshStreamingReviewed();

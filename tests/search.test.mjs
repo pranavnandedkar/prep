@@ -6,6 +6,7 @@ import { rateLimiterCodeExamples } from '../dist/rate-limiter-code.js';
 import { highlightJava } from '../dist/java-highlight.js';
 import { codingPatternCodeExamples } from '../dist/coding-pattern-code.js';
 import { streamingStaffSections } from '../dist/streaming-staff-plus-content.js';
+import { gcpPlaybookSections } from '../dist/gcp-playbook-content.js';
 
 const index = makeSearchIndex(sections, topics);
 test('exact topic names are the first result for Enter', () => {
@@ -65,6 +66,14 @@ test('new sections, Kafka, and coding patterns are globally searchable', () => {
   assert.equal(Object.keys(codingPatternCodeExamples).length, 10);
   assert.equal(searchEntries(index, 'watermarks')[0].id, 'streaming-staff-plus');
   assert.equal(searchEntries(index, 'deep scenarios')[0].id, 'streaming-staff-plus');
+  assert.equal(searchEntries(index, 'BigQuery')[0].id, 'gcp-data-engineering');
+  assert.equal(searchEntries(index, 'Beam Dataflow')[0].id, 'gcp-data-engineering');
+});
+test('the complete GCP interview playbook is stored locally', () => {
+  assert.equal(gcpPlaybookSections.length, 17);
+  assert.equal(gcpPlaybookSections[0].title, 'Focus first');
+  assert.equal(gcpPlaybookSections.at(-1).title, 'Readiness check');
+  assert.ok(gcpPlaybookSections.every((section) => section.id && section.html.length > 500));
 });
 test('the complete Streaming Staff+ guide is stored locally', () => {
   assert.equal(streamingStaffSections.length, 11);

@@ -38,6 +38,12 @@ export const topics = [
     blocks: [{ heading: 'Question bank', bullets: ['architecture and design', 'events and contracts', 'delivery and correctness', 'ordering time and state', 'failure and resilience', 'replay and reprocessing', 'observability and operations', 'security and governance', 'technology trade-offs', 'Staff+ leadership', 'deep scenarios'] }],
   },
   {
+    id: 'gcp-data-engineering', section: 'streaming', title: 'GCP data engineering',
+    description: 'Staff+ playbook for BigQuery, Dataflow, SQL, modeling, operations, and leadership.',
+    keywords: ['gcp', 'google cloud', 'data engineering', 'bigquery', 'apache beam', 'dataflow', 'pubsub', 'pub/sub', 'data modeling', 'advanced sql', 'dataproc', 'spark', 'flink', 'airflow', 'dataform', 'datastream', 'bigtable', 'spanner', 'data governance', 'staff leadership', 'six week plan'],
+    blocks: [{ heading: 'Interview playbook', bullets: ['advanced SQL', 'data modeling', 'data platform foundations', 'BigQuery', 'Beam and Dataflow', 'Kafka and Pub/Sub', 'GCP landscape', 'production engineering', 'system design', 'Staff+ leadership'] }],
+  },
+  {
     id: 'coding-patterns', section: 'coding', title: 'Coding patterns',
     description: 'Recognize the shape, choose the template, state the invariant.',
     keywords: ['leetcode', 'cheat sheet', 'two pointers', 'sliding window', 'binary search', 'bfs', 'dfs', 'heap', 'top k', 'intervals', 'monotonic stack', 'backtracking', 'dynamic programming'],
