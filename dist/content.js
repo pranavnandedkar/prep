@@ -44,6 +44,12 @@ export const topics = [
     blocks: [{ heading: 'Interview playbook', bullets: ['advanced SQL', 'data modeling', 'data platform foundations', 'BigQuery', 'Beam and Dataflow', 'Kafka and Pub/Sub', 'GCP landscape', 'production engineering', 'system design', 'Staff+ leadership'] }],
   },
   {
+    id: 'staff-architect-scenarios', section: 'streaming', title: 'Staff+ architect scenarios',
+    description: 'Sixteen realistic leadership and architecture scenarios with model responses and probes.',
+    keywords: ['staff architect scenarios', 'staff plus', 'leadership', 'ambiguity', 'platform migration', 'standards without authority', 'data incident', 'finops', 'real time', 'schema change', 'technical conflict', 'build versus buy', 'platform adoption', 'sensitive data', 'multi region resilience', 'backfill', 'legacy decommission', 'failure', 'technical bar', 'model response', 'follow up probes'],
+    blocks: [{ heading: 'Scenario workbook', bullets: ['answer method', 'ambiguous mandate', 'platform migration', 'standards without authority', 'incorrect executive data', 'cost reduction', 'real-time requirements', 'schema evolution', 'principal conflict', 'build versus buy', 'platform adoption', 'security risk', 'multi-region resilience', 'historical backfill', 'legacy decommission', 'initiative failure', 'technical leadership'] }],
+  },
+  {
     id: 'coding-patterns', section: 'coding', title: 'Coding patterns',
     description: 'Recognize the shape, choose the template, state the invariant.',
     keywords: ['leetcode', 'cheat sheet', 'two pointers', 'sliding window', 'binary search', 'bfs', 'dfs', 'heap', 'top k', 'intervals', 'monotonic stack', 'backtracking', 'dynamic programming'],

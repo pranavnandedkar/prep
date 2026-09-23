@@ -7,6 +7,7 @@ import { highlightJava } from '../dist/java-highlight.js';
 import { codingPatternCodeExamples } from '../dist/coding-pattern-code.js';
 import { streamingStaffSections } from '../dist/streaming-staff-plus-content.js';
 import { gcpPlaybookSections } from '../dist/gcp-playbook-content.js';
+import { staffScenarioSections } from '../dist/staff-scenarios-content.js';
 
 const index = makeSearchIndex(sections, topics);
 test('exact topic names are the first result for Enter', () => {
@@ -68,6 +69,14 @@ test('new sections, Kafka, and coding patterns are globally searchable', () => {
   assert.equal(searchEntries(index, 'deep scenarios')[0].id, 'streaming-staff-plus');
   assert.equal(searchEntries(index, 'BigQuery')[0].id, 'gcp-data-engineering');
   assert.equal(searchEntries(index, 'Beam Dataflow')[0].id, 'gcp-data-engineering');
+  assert.equal(searchEntries(index, 'standards without authority')[0].id, 'staff-architect-scenarios');
+  assert.equal(searchEntries(index, 'principal conflict')[0].id, 'staff-architect-scenarios');
+});
+test('the complete Staff+ scenario workbook is stored locally', () => {
+  assert.equal(staffScenarioSections.length, 18);
+  assert.equal(staffScenarioSections[0].id, 'method');
+  assert.equal(staffScenarioSections.at(-1).id, 'rapid');
+  assert.ok(staffScenarioSections.every((section) => section.id && section.title && section.html.length > 500));
 });
 test('the complete GCP interview playbook is stored locally', () => {
   assert.equal(gcpPlaybookSections.length, 17);

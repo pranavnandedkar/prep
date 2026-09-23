@@ -6,6 +6,7 @@ import { codingPatternCodeExamples } from './coding-pattern-code.js';
 import { fullKafkaArchitectContent } from './kafka-content.js';
 import { streamingStaffSections } from './streaming-staff-plus-content.js';
 import { gcpPlaybookSections } from './gcp-playbook-content.js';
+import { staffScenarioSections } from './staff-scenarios-content.js';
 
 const $ = (id) => document.getElementById(id);
 const escapeHTML = (value) => String(value).replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
@@ -43,7 +44,7 @@ function updateThemeButton() {
   $('theme-toggle').innerHTML = icon(dark ? 'sun' : 'moon');
   $('theme-toggle').setAttribute('aria-label', dark ? 'Use light theme' : 'Use dark theme');
   $('theme-toggle').title = dark ? 'Use light theme' : 'Use dark theme';
-  document.querySelector('meta[name="theme-color"]').content = dark ? '#10181d' : '#17242b';
+  document.querySelector('meta[name="theme-color"]').content = dark ? '#07101d' : '#17242b';
 }
 
 function setTheme(theme, persist = true) {
@@ -93,7 +94,7 @@ function topicPage(topic, section) {
   const index = siblings.findIndex((item) => item.id === topic.id);
   const previous = siblings[index - 1];
   const next = siblings[index + 1];
-  const content = topic.id === 'rate-limiter' ? rateLimiterContent() : topic.id === 'kafka-architect' ? fullKafkaArchitectContent() : topic.id === 'streaming-staff-plus' ? streamingStaffGuideContent() : topic.id === 'gcp-data-engineering' ? gcpPlaybookContent() : topic.id === 'coding-patterns' ? codingPatternsContent() : topic.blocks.length ? topic.blocks.map((block) => `<section class="content-block"><h2>${escapeHTML(block.heading)}</h2>${block.text ? `<p>${escapeHTML(block.text)}</p>` : ''}${block.bullets?.length ? `<ul>${block.bullets.map((bullet) => `<li>${escapeHTML(bullet)}</li>`).join('')}</ul>` : ''}</section>`).join('') : `<section class="placeholder-page"><div class="placeholder-label">${icon('note')} TOPIC OUTLINE</div><h2>Ready for the essentials.</h2><p>The page is in place. Your revision notes and section structure will go here.</p><div aria-hidden="true"><div class="placeholder-line"></div><div class="placeholder-line"></div></div></section>`;
+  const content = topic.id === 'rate-limiter' ? rateLimiterContent() : topic.id === 'kafka-architect' ? fullKafkaArchitectContent() : topic.id === 'streaming-staff-plus' ? streamingStaffGuideContent() : topic.id === 'gcp-data-engineering' ? gcpPlaybookContent() : topic.id === 'staff-architect-scenarios' ? staffScenariosContent() : topic.id === 'coding-patterns' ? codingPatternsContent() : topic.blocks.length ? topic.blocks.map((block) => `<section class="content-block"><h2>${escapeHTML(block.heading)}</h2>${block.text ? `<p>${escapeHTML(block.text)}</p>` : ''}${block.bullets?.length ? `<ul>${block.bullets.map((bullet) => `<li>${escapeHTML(bullet)}</li>`).join('')}</ul>` : ''}</section>`).join('') : `<section class="placeholder-page"><div class="placeholder-label">${icon('note')} TOPIC OUTLINE</div><h2>Ready for the essentials.</h2><p>The page is in place. Your revision notes and section structure will go here.</p><div aria-hidden="true"><div class="placeholder-line"></div><div class="placeholder-line"></div></div></section>`;
   return `${breadcrumb(section, topic)}<div class="topic-header"><p class="eyebrow">${escapeHTML(section.title.toUpperCase())}</p><div class="heading-row"><h1>${escapeHTML(topic.title)}</h1>${badge(topic)}</div><p class="intro">${escapeHTML(topic.description)}</p></div><div class="topic-body">${content}</div><nav class="topic-pagination" aria-label="Adjacent topics">${previous ? `<a href="#/topic/${previous.id}"><span>Previous topic</span>← ${escapeHTML(previous.title)}</a>` : `<a href="#/section/${section.id}"><span>Back to section</span>← ${escapeHTML(section.title)}</a>`}${next ? `<a class="next" href="#/topic/${next.id}"><span>Next topic</span>${escapeHTML(next.title)} →</a>` : ''}</nav>`;
 }
 
@@ -262,6 +263,12 @@ function gcpPlaybookContent() {
   return `<article class="rate-guide gcp-playbook"><nav class="topic-jump" aria-label="GCP playbook sections"><span>PLAYBOOK INDEX</span>${nav}</nav><section class="revision-card gcp-hero"><div><span class="revision-kicker">INTERVIEW FIELD GUIDE / STAFF+</span><h2>GCP data engineering. Know what matters.</h2><p>A compact preparation map for engineers who already know Spark, Airflow, Flink, and Kafka. Focus on architectural judgment, GCP depth, production correctness, and cross-team leadership.</p></div><div class="gcp-priorities"><span><b>01</b> BigQuery</span><span><b>02</b> Beam & Dataflow</span><span><b>03</b> SQL & modeling</span></div></section>${content}</article>`;
 }
 
+function staffScenariosContent() {
+  const nav = staffScenarioSections.map((section, index) => `<button type="button" data-scroll-to="scenario-${section.id}"><b>${String(index).padStart(2, '0')}</b><span>${escapeHTML(section.title)}</span></button>`).join('');
+  const content = staffScenarioSections.map((section) => `<section class="staff-scenario-section" id="scenario-${section.id}">${section.html}</section>`).join('');
+  return `<article class="rate-guide staff-scenarios"><nav class="topic-jump" aria-label="Staff architect scenario index"><span>SCENARIO INDEX</span>${nav}</nav><section class="scenario-hero"><span class="revision-kicker">SCENARIO WORKBOOK / STAFF+ ARCHITECT</span><h2>Answer beyond the <em>technology.</em></h2><p>Practice how you frame ambiguity, choose principles, align teams, retire risk, measure outcomes, and learn. Use these response blueprints as adaptable structures, not scripts.</p><div><b>16 realistic scenarios</b><b>Model responses</b><b>Follow-up probes</b><b>Red flags</b></div></section>${content}</article>`;
+}
+
 const streamingReviewKey = 'prep-streaming-reviewed';
 
 function streamingReviewed() {
@@ -319,7 +326,7 @@ function render({ focus = false } = {}) {
     title = 'Page not found';
   }
   $('main').innerHTML = html;
-  $('main').className = ['rate-limiter', 'kafka-architect', 'coding-patterns', 'gcp-data-engineering'].includes(topic?.id) ? 'rate-limiter-page' : topic?.id === 'streaming-staff-plus' ? 'streaming-guide-page' : '';
+  $('main').className = ['rate-limiter', 'kafka-architect', 'coding-patterns', 'gcp-data-engineering', 'staff-architect-scenarios'].includes(topic?.id) ? 'rate-limiter-page' : topic?.id === 'streaming-staff-plus' ? 'streaming-guide-page' : '';
   document.title = `${title} · prep`;
   renderNavigation(section?.id, topic?.id, title === 'Interview library');
   if (topic?.id === 'streaming-staff-plus') refreshStreamingReviewed();
