@@ -8,9 +8,9 @@
     <title>Interview library · prep</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='10' fill='%2317242b'/%3E%3Cpath d='M12 10h15v21H12z' fill='none' stroke='%23a9e3c5' stroke-width='2.5'/%3E%3Cpath d='M17 10v21m4-15h3m-3 5h3' stroke='%23a9e3c5' stroke-width='2'/%3E%3C/svg%3E" />
     <script>try{const saved=localStorage.getItem('prep-theme');document.documentElement.dataset.theme=saved||((matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light')}catch{document.documentElement.dataset.theme='light'}</script>
-    <link rel="stylesheet" href="./styles.css?v=2026-09-23-casebook" />
+    <link rel="stylesheet" href="./styles.css?v=2026-09-23-deep-search" />
     <link rel="stylesheet" href="./gcp-casebook.css?v=2026-09-23-casebook" />
-    <script type="module" src="./app.js?v=2026-09-23-casebook"></script>
+    <script type="module" src="./app.js?v=2026-09-23-deep-search"></script>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -26,11 +26,12 @@
         <button class="mobile-menu icon-button" id="menu-toggle" aria-label="Open navigation" aria-controls="sidebar" aria-expanded="false"></button>
         <div class="search" id="search-container">
           <span class="search-icon" id="search-icon" aria-hidden="true"></span>
-          <input id="search-input" type="search" role="combobox" aria-label="Search all topics and sections" aria-autocomplete="list" aria-expanded="false" aria-controls="search-results" placeholder="Search all topics and sections…" autocomplete="off" spellcheck="false" />
+          <input id="search-input" type="search" role="combobox" aria-label="Search all topics and content" aria-autocomplete="list" aria-expanded="false" aria-controls="search-results" placeholder="Search topics, questions, and notes…" autocomplete="off" spellcheck="false" />
           <kbd class="search-shortcut" id="search-shortcut">⌘ K</kbd>
           <button class="clear-search icon-button" id="clear-search" aria-label="Clear search" hidden>×</button>
           <div class="search-panel" id="search-panel" hidden>
             <div class="search-panel-heading">SEARCH YOUR NOTEBOOK <span id="result-count"></span></div>
+            <div id="search-filters" class="search-filters" role="group" aria-label="Filter search results by section"></div>
             <div id="search-results" role="listbox" aria-label="Search results"></div>
             <div class="search-help"><span><kbd>↑</kbd><kbd>↓</kbd> navigate</span><span><kbd>↵</kbd> open</span><span><kbd>esc</kbd> close</span></div>
           </div>

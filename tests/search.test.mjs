@@ -23,6 +23,23 @@ test('partial names, aliases, punctuation, and case match', () => {
 test('empty and unmatched queries return no results', () => {
   for (const query of ['', '   ', '!!!', 'unmatched-topic-123']) assert.deepEqual(searchEntries(index, query), []);
 });
+test('content-only phrases return a precise deep link with an excerpt', () => {
+  const deep = [...index, {
+    id: 'gcp-system-design-cases:find-cdc-thesis', kind: 'content', title: 'Architect’s thesis',
+    subtitle: 'Data Eng › GCP system design cases › Database CDC into BigQuery',
+    snippet: 'Preserve an immutable change log and derive current state. Source commit position—not arrival time—orders changes.',
+    searchText: 'Preserve an immutable change log and derive current state. Source commit position—not arrival time—orders changes.',
+    href: '#/topic/gcp-system-design-cases/find-cdc-thesis',
+  }];
+  const [result] = searchEntries(deep, 'source commit position');
+  assert.equal(result.href, '#/topic/gcp-system-design-cases/find-cdc-thesis');
+  assert.match(result.excerpt, /Source commit position/);
+});
+test('common data engineering acronyms find their expanded names', () => {
+  const deep = [{ id: 'expanded', title: 'Recovery', searchText: 'Send failures to the dead-letter queue and replay them after repair.', snippet: 'Send failures to the dead-letter queue and replay them after repair.', href: '#/topic/kafka-architect/find-recovery' }];
+  assert.equal(searchEntries(deep, 'DLQ')[0].id, 'expanded');
+  assert.equal(searchEntries(deep, 'dead letter queue')[0].id, 'expanded');
+});
 test('the same index includes all three sections and new topic content', () => {
   const expanded = makeSearchIndex(sections, [...topics,
     { id: 'two-sum', section: 'coding', title: 'Two sum', keywords: ['hash map'], blocks: [] },

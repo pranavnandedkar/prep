@@ -1,5 +1,5 @@
 import { sections, topics } from './content.js?v=2026-09-23-casebook';
-import { makeSearchIndex, searchEntries } from './search.js';
+import { makeSearchIndex, searchEntries } from './search.js?v=2026-09-23-deep-search';
 import { rateLimiterCodeExamples } from './rate-limiter-code.js';
 import { highlightJava } from './java-highlight.js';
 import { codingPatternCodeExamples } from './coding-pattern-code.js';
@@ -33,8 +33,10 @@ const sectionTopics = (id) => topics.filter((topic) => topic.section === id);
 const countLabel = (count) => `${count} ${count === 1 ? 'topic' : 'topics'}`;
 const badge = (topic) => topic.blocks.length ? '<span class="outline-badge">Notes</span>' : `<span class="outline-badge">${icon('note')} Outline</span>`;
 const searchIndex = makeSearchIndex(sections, topics);
+const preparedTopicPages = new Map();
 let activeResults = [];
 let activeIndex = 0;
+let activeSectionFilter = 'all';
 let codeSheetTrigger = null;
 
 $('search-icon').innerHTML = icon('search');
@@ -90,13 +92,42 @@ function sectionPage(section) {
   return `${breadcrumb(section)}<div class="section-summary">${sectionIcon(section)}<div class="heading-row"><div><p class="eyebrow">YOUR SECTIONS / 0${sections.indexOf(section) + 1}</p><h1>${escapeHTML(section.title)}</h1><p class="intro">${escapeHTML(section.description)}</p></div><span class="library-count">${countLabel(items.length)}</span></div></div>${items.length ? directory(items) : `<div class="empty-state">${sectionIcon(section)}<h2>${section.id === 'behavioral' ? 'Make room for your stories.' : 'Ready for your first topic.'}</h2><p>${section.id === 'behavioral' ? 'Your behavioral and leadership notes will live here.' : `Your ${escapeHTML(section.title)} revision notes will live here.`}</p><a class="text-link" href="#/">View all topics ${icon('arrow')}</a></div>`}`;
 }
 
+function annotateTopicContent(topic, section, html) {
+  const template = document.createElement('template');
+  template.innerHTML = html;
+  const entries = [];
+  let heading = '';
+  let subheading = '';
+  let question = '';
+  let count = 0;
+  for (const element of template.content.querySelectorAll('h2, h3, h4, p, li, summary, td, th, .question, .callout, .probe, .redflag')) {
+    if (element.closest('nav, [role="img"], .streaming-guide-tools, .source-note')) continue;
+    const text = element.textContent.replace(/\s+/g, ' ').trim();
+    if (text.length < 5) continue;
+    if (element.matches('h2')) { heading = text; subheading = ''; question = ''; }
+    if (element.matches('h3, h4')) { subheading = text; question = ''; }
+    if (element.matches('summary')) question = text.replace(/^\d+\s*/, '');
+    // Search anchors are generated in document order and inserted into the cached page HTML.
+    const anchor = element.id || `find-${topic.id}-${++count}`;
+    if (!element.id) element.id = anchor;
+    const title = element.matches('h2, h3, h4, summary') ? (question || text) : (question || subheading || heading || topic.title);
+    const context = [section.title, topic.title, heading !== title ? heading : ''].filter(Boolean).join(' › ');
+    entries.push({ id: `${topic.id}:${anchor}`, kind: 'content', sectionId: section.id, title, subtitle: context, snippet: text, searchText: text, href: `#/topic/${topic.id}/${anchor}`, color: section.color, icon: section.icon });
+  }
+  return { html: template.innerHTML, entries };
+}
+
 function topicPage(topic, section) {
+  if (preparedTopicPages.has(topic.id)) return preparedTopicPages.get(topic.id).html;
   const siblings = sectionTopics(section.id);
   const index = siblings.findIndex((item) => item.id === topic.id);
   const previous = siblings[index - 1];
   const next = siblings[index + 1];
   const content = topic.id === 'rate-limiter' ? rateLimiterContent() : topic.id === 'kafka-architect' ? fullKafkaArchitectContent() : topic.id === 'streaming-staff-plus' ? streamingStaffGuideContent() : topic.id === 'gcp-data-engineering' ? gcpPlaybookContent() : topic.id === 'staff-architect-scenarios' ? staffScenariosContent() : topic.id === 'gcp-system-design-cases' ? gcpSystemDesignCasesContent() : topic.id === 'coding-patterns' ? codingPatternsContent() : topic.blocks.length ? topic.blocks.map((block) => `<section class="content-block"><h2>${escapeHTML(block.heading)}</h2>${block.text ? `<p>${escapeHTML(block.text)}</p>` : ''}${block.bullets?.length ? `<ul>${block.bullets.map((bullet) => `<li>${escapeHTML(bullet)}</li>`).join('')}</ul>` : ''}</section>`).join('') : `<section class="placeholder-page"><div class="placeholder-label">${icon('note')} TOPIC OUTLINE</div><h2>Ready for the essentials.</h2><p>The page is in place. Your revision notes and section structure will go here.</p><div aria-hidden="true"><div class="placeholder-line"></div><div class="placeholder-line"></div></div></section>`;
-  return `${breadcrumb(section, topic)}<div class="topic-header"><p class="eyebrow">${escapeHTML(section.title.toUpperCase())}</p><div class="heading-row"><h1>${escapeHTML(topic.title)}</h1>${badge(topic)}</div><p class="intro">${escapeHTML(topic.description)}</p></div><div class="topic-body">${content}</div><nav class="topic-pagination" aria-label="Adjacent topics">${previous ? `<a href="#/topic/${previous.id}"><span>Previous topic</span>← ${escapeHTML(previous.title)}</a>` : `<a href="#/section/${section.id}"><span>Back to section</span>← ${escapeHTML(section.title)}</a>`}${next ? `<a class="next" href="#/topic/${next.id}"><span>Next topic</span>${escapeHTML(next.title)} →</a>` : ''}</nav>`;
+  const prepared = annotateTopicContent(topic, section, content);
+  const html = `${breadcrumb(section, topic)}<div class="topic-header"><p class="eyebrow">${escapeHTML(section.title.toUpperCase())}</p><div class="heading-row"><h1>${escapeHTML(topic.title)}</h1>${badge(topic)}</div><p class="intro">${escapeHTML(topic.description)}</p></div><div class="topic-body">${prepared.html}</div><nav class="topic-pagination" aria-label="Adjacent topics">${previous ? `<a href="#/topic/${previous.id}"><span>Previous topic</span>← ${escapeHTML(previous.title)}</a>` : `<a href="#/section/${section.id}"><span>Back to section</span>← ${escapeHTML(section.title)}</a>`}${next ? `<a class="next" href="#/topic/${next.id}"><span>Next topic</span>${escapeHTML(next.title)} →</a>` : ''}</nav>`;
+  preparedTopicPages.set(topic.id, { html, entries: prepared.entries });
+  return html;
 }
 
 function distributedDiagram() {
@@ -313,12 +344,12 @@ function filterStreamingQuestions(query) {
 function render({ focus = false } = {}) {
   closeCodeSheet();
   const route = location.hash || '#/';
-  const [, type, id, extra] = route.split('/');
+  const [, type, id, extra, codeId, overflow] = route.split('/');
   let section;
   let topic;
   let title;
   let html;
-  if (type === 'topic' && id && !extra && (topic = topics.find((item) => item.id === id))) {
+  if (type === 'topic' && id && !overflow && (!extra || (extra.startsWith('find-') && !codeId) || (extra === 'code' && codeId)) && (topic = topics.find((item) => item.id === id))) {
     section = sections.find((item) => item.id === topic.section);
     html = topicPage(topic, section);
     title = topic.title;
@@ -340,7 +371,17 @@ function render({ focus = false } = {}) {
   closeSearch();
   setMenu(false);
   window.scrollTo({ top: 0, behavior: 'instant' });
-  if (focus) $('main').focus({ preventScroll: true });
+  if (extra?.startsWith('find-')) {
+    const target = document.getElementById(extra);
+    if (target) {
+      target.closest('details')?.setAttribute('open', '');
+      target.classList.add('search-target');
+      requestAnimationFrame(() => target.scrollIntoView({ block: 'center', behavior: 'instant' }));
+    }
+  } else if (extra === 'code' && codeId) {
+    const trigger = $('main').querySelector(`[data-code-example="${codeId}"]`);
+    if (trigger) openCodeSheet(codeId, trigger);
+  } else if (focus) $('main').focus({ preventScroll: true });
 }
 
 function closeSearch() {
@@ -375,25 +416,43 @@ function closeCodeSheet() {
   codeSheetTrigger = null;
 }
 
+function dismissCodeSheet() {
+  closeCodeSheet();
+  const match = location.hash.match(/^#\/topic\/([a-z0-9-]+)\/code\/[a-z0-9-]+$/);
+  if (match) history.replaceState(null, '', `#/topic/${match[1]}`);
+}
+
 function updateSelectedResult() {
   document.querySelectorAll('.search-result').forEach((element, index) => element.setAttribute('aria-selected', String(index === activeIndex)));
   if (activeResults[activeIndex]) $('search-input').setAttribute('aria-activedescendant', `result-${activeIndex}`);
   else $('search-input').removeAttribute('aria-activedescendant');
 }
 
+function highlightSearchText(value, query) {
+  const words = [...new Set((query.toLowerCase().match(/[a-z0-9]+/g) || []).filter((word) => word.length > 1))].sort((a, b) => b.length - a.length);
+  if (!words.length) return escapeHTML(value);
+  const expression = new RegExp(`(${words.join('|')})`, 'gi');
+  return String(value).split(expression).map((part) => words.includes(part.toLowerCase()) ? `<mark>${escapeHTML(part)}</mark>` : escapeHTML(part)).join('');
+}
+
 function updateSearch() {
   const query = $('search-input').value;
   $('clear-search').hidden = !query;
   $('search-shortcut').hidden = Boolean(query);
-  activeResults = searchEntries(searchIndex, query);
+  const allMatches = searchEntries(searchIndex, query);
+  const availableSections = sections.filter((section) => allMatches.some((entry) => entry.sectionId === section.id));
+  if (activeSectionFilter !== 'all' && !availableSections.some((section) => section.id === activeSectionFilter)) activeSectionFilter = 'all';
+  $('search-filters').innerHTML = allMatches.length ? [{ id: 'all', title: 'All' }, ...availableSections.map((section) => ({ id: section.id, title: section.shortTitle }))].map((filter) => `<button type="button" data-search-filter="${filter.id}" aria-pressed="${filter.id === activeSectionFilter}">${escapeHTML(filter.title)}</button>`).join('') : '';
+  const matches = activeSectionFilter === 'all' ? allMatches : allMatches.filter((entry) => entry.sectionId === activeSectionFilter);
+  activeResults = matches.slice(0, 50);
   activeIndex = 0;
-  if (!query.trim()) { closeSearch(); $('search-announcement').textContent = ''; return; }
+  if (!query.trim()) { activeSectionFilter = 'all'; closeSearch(); $('search-announcement').textContent = ''; return; }
   $('search-panel').hidden = false;
   $('search-input').setAttribute('aria-expanded', 'true');
-  const resultCount = `${activeResults.length} ${activeResults.length === 1 ? 'result' : 'results'}`;
+  const resultCount = matches.length > activeResults.length ? `First 50 of ${matches.length} results` : `${matches.length} ${matches.length === 1 ? 'result' : 'results'}`;
   $('result-count').textContent = resultCount;
   $('search-announcement').textContent = resultCount;
-  $('search-results').innerHTML = activeResults.length ? activeResults.map((entry, index) => `<div class="search-result" id="result-${index}" role="option" aria-selected="${index === 0}" data-result-index="${index}">${sectionIcon(entry, true)}<span class="result-copy"><span class="result-title">${escapeHTML(entry.title)}</span><span class="result-subtitle">${escapeHTML(entry.subtitle)}</span></span><span class="result-enter" aria-hidden="true">↵</span></div>`).join('') : '<div class="no-results">No matches. Try a topic name, section, or keyword.</div>';
+  $('search-results').innerHTML = activeResults.length ? activeResults.map((entry, index) => `<div class="search-result" id="result-${index}" role="option" aria-selected="${index === 0}" data-result-index="${index}">${sectionIcon(entry, true)}<span class="result-copy"><span class="result-title">${highlightSearchText(entry.title, entry.matchedQuery || query)}</span><span class="result-subtitle">${escapeHTML(entry.subtitle)}</span>${entry.excerpt && entry.excerpt !== entry.title ? `<span class="result-excerpt">${highlightSearchText(entry.excerpt, entry.matchedQuery || query)}</span>` : ''}</span><span class="result-enter" aria-hidden="true">↵</span></div>`).join('') : '<div class="no-results">No matches. Try a topic, question, or phrase from your notes.</div>';
   updateSelectedResult();
 }
 
@@ -423,6 +482,12 @@ $('search-input').addEventListener('keydown', (event) => {
   } else if (event.key === 'Enter' && !$('search-panel').hidden) { event.preventDefault(); openResult(activeIndex); }
 });
 $('search-results').addEventListener('mousedown', (event) => event.preventDefault());
+$('search-filters').addEventListener('click', (event) => {
+  const filter = event.target.closest('[data-search-filter]');
+  if (!filter) return;
+  activeSectionFilter = filter.dataset.searchFilter;
+  updateSearch();
+});
 $('search-results').addEventListener('click', (event) => {
   const option = event.target.closest('[data-result-index]');
   if (option) openResult(Number(option.dataset.resultIndex));
@@ -494,11 +559,11 @@ $('main').addEventListener('click', (event) => {
 $('main').addEventListener('input', (event) => {
   if (event.target.id === 'streaming-question-search') filterStreamingQuestions(event.target.value);
 });
-$('code-sheet-close').addEventListener('click', closeCodeSheet);
-$('code-sheet-backdrop').addEventListener('click', closeCodeSheet);
+$('code-sheet-close').addEventListener('click', dismissCodeSheet);
+$('code-sheet-backdrop').addEventListener('click', dismissCodeSheet);
 document.addEventListener('keydown', (event) => {
   if ($('code-sheet-layer').hidden) return;
-  if (event.key === 'Escape') { event.preventDefault(); closeCodeSheet(); return; }
+  if (event.key === 'Escape') { event.preventDefault(); dismissCodeSheet(); return; }
   if (event.key !== 'Tab') return;
   const controls = [...$('code-sheet').querySelectorAll('button, a, [tabindex]:not([tabindex="-1"])')].filter((element) => !element.hidden);
   const first = controls[0];
@@ -509,4 +574,15 @@ document.addEventListener('keydown', (event) => {
 $('sidebar').querySelector('.brand').addEventListener('click', () => { setMenu(false); $('main').focus(); });
 window.addEventListener('hashchange', () => render({ focus: true }));
 matchMedia('(max-width: 650px)').addEventListener('change', () => setMenu(false));
+for (const topic of topics) {
+  topicPage(topic, sections.find((section) => section.id === topic.section));
+  searchIndex.push(...preparedTopicPages.get(topic.id).entries);
+}
+for (const [topicId, examples] of [['rate-limiter', rateLimiterCodeExamples], ['coding-patterns', codingPatternCodeExamples]]) {
+  const topic = topics.find((item) => item.id === topicId);
+  const section = sections.find((item) => item.id === topic.section);
+  for (const [exampleId, example] of Object.entries(examples)) {
+    searchIndex.push({ id: `${topicId}:code:${exampleId}`, kind: 'code', sectionId: section.id, title: `${example.title} · Java`, subtitle: `${section.title} › ${topic.title} › Code`, snippet: `${example.note} ${example.code}`, searchText: `${example.title} ${example.note} ${example.code}`, href: `#/topic/${topicId}/code/${exampleId}`, color: section.color, icon: 'code' });
+  }
+}
 render();
