@@ -1,4 +1,4 @@
-import { sections, topics } from './content.js';
+import { sections, topics } from './content.js?v=5c5f997';
 import { makeSearchIndex, searchEntries } from './search.js';
 import { rateLimiterCodeExamples } from './rate-limiter-code.js';
 import { highlightJava } from './java-highlight.js';
