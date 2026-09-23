@@ -1,6 +1,6 @@
 # prep
 
-A small, static interview notebook for System design, Streaming, Coding, AI / ML, and Behavioral / Leadership.
+A small, static interview notebook for System design, Data Eng, Coding, AI / ML, and Behavioral / Leadership.
 
 ## Current scope
 

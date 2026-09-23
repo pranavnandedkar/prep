@@ -2,7 +2,7 @@
 // Add your own topics here. A topic's blocks stay empty until its format is decided.
 export const sections = [
   { id: 'system-design', title: 'System design', shortTitle: 'System design', icon: 'system', color: 'green', description: 'Systems, scale, and the decisions in between.' },
-  { id: 'streaming', title: 'Streaming', shortTitle: 'Streaming', icon: 'stream', color: 'purple', description: 'Kafka, event platforms, and real-time data.' },
+  { id: 'streaming', title: 'Data Eng', shortTitle: 'Data Eng', icon: 'stream', color: 'purple', description: 'Streaming, GCP data platforms, and Staff+ architecture.' },
   { id: 'coding', title: 'Coding', shortTitle: 'Coding', icon: 'code', color: 'blue', description: 'Your questions, patterns, and approaches.' },
   { id: 'ai-ml', title: 'AI / ML', shortTitle: 'AI / ML', icon: 'ai', color: 'pink', description: 'Models, platforms, evaluation, and production trade-offs.' },
   { id: 'behavioral', title: 'Behavioral / Leadership', shortTitle: 'Behavioral / Leadership', icon: 'people', color: 'orange', description: 'Experiences, decisions, and the impact you made.' },
@@ -48,6 +48,12 @@ export const topics = [
     description: 'Sixteen realistic leadership and architecture scenarios with model responses and probes.',
     keywords: ['staff architect scenarios', 'staff plus', 'leadership', 'ambiguity', 'platform migration', 'standards without authority', 'data incident', 'finops', 'real time', 'schema change', 'technical conflict', 'build versus buy', 'platform adoption', 'sensitive data', 'multi region resilience', 'backfill', 'legacy decommission', 'failure', 'technical bar', 'model response', 'follow up probes'],
     blocks: [{ heading: 'Scenario workbook', bullets: ['answer method', 'ambiguous mandate', 'platform migration', 'standards without authority', 'incorrect executive data', 'cost reduction', 'real-time requirements', 'schema evolution', 'principal conflict', 'build versus buy', 'platform adoption', 'security risk', 'multi-region resilience', 'historical backfill', 'legacy decommission', 'initiative failure', 'technical leadership'] }],
+  },
+  {
+    id: 'gcp-system-design-cases', section: 'streaming', title: 'GCP system design cases',
+    description: 'Eight complete Staff+ designs with scale math, GCP architecture, trade-offs, operations, and probes.',
+    keywords: ['gcp system design casebook', 'clickstream analytics', 'cdc to bigquery', 'real time fraud', 'multi tenant data platform', 'privacy deletion', 'ml feature platform', 'governed metrics', 'semantic layer', 'hadoop kafka migration', 'interview checklist'],
+    blocks: [{ heading: 'Casebook', bullets: ['six-step interview method', 'clickstream analytics', 'database CDC into BigQuery', 'real-time fraud decisioning', 'multi-tenant data platform', 'privacy deletion', 'online and offline ML features', 'governed metrics and semantic layer', 'on-prem Hadoop and Kafka migration', 'final design checklist'] }],
   },
   {
     id: 'coding-patterns', section: 'coding', title: 'Coding patterns',

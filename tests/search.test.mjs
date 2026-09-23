@@ -8,6 +8,7 @@ import { codingPatternCodeExamples } from '../dist/coding-pattern-code.js';
 import { streamingStaffSections } from '../dist/streaming-staff-plus-content.js';
 import { gcpPlaybookSections } from '../dist/gcp-playbook-content.js';
 import { staffScenarioSections } from '../dist/staff-scenarios-content.js';
+import { gcpSystemDesignCases } from '../dist/gcp-system-design-cases-content.js';
 
 const index = makeSearchIndex(sections, topics);
 test('exact topic names are the first result for Enter', () => {
@@ -71,6 +72,17 @@ test('new sections, Kafka, and coding patterns are globally searchable', () => {
   assert.equal(searchEntries(index, 'Beam Dataflow')[0].id, 'gcp-data-engineering');
   assert.equal(searchEntries(index, 'standards without authority')[0].id, 'staff-architect-scenarios');
   assert.equal(searchEntries(index, 'principal conflict')[0].id, 'staff-architect-scenarios');
+  assert.equal(searchEntries(index, 'clickstream analytics')[0].id, 'gcp-system-design-cases');
+  assert.equal(searchEntries(index, 'privacy deletion')[0].id, 'gcp-system-design-cases');
+});
+test('Data Eng includes the complete local GCP system design casebook', () => {
+  assert.equal(sections.find((section) => section.id === 'streaming').title, 'Data Eng');
+  assert.equal(gcpSystemDesignCases.length, 10);
+  assert.deepEqual(gcpSystemDesignCases.map((section) => section.id), [
+    'method', 'clickstream', 'cdc', 'fraud', 'multitenant', 'privacy', 'features', 'metrics', 'migration', 'check',
+  ]);
+  assert.equal(gcpSystemDesignCases.slice(1, -1).filter((section) => section.html.includes('class="diagram"')).length, 8);
+  assert.ok(gcpSystemDesignCases.every((section) => section.html.includes(`id="case-${section.id}"`)));
 });
 test('the complete Staff+ scenario workbook is stored locally', () => {
   assert.equal(staffScenarioSections.length, 18);
